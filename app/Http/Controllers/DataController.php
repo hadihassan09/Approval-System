@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
+use App\Models\Data;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
-class PostController extends Controller
+class DataController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -28,9 +28,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::where('isApproved', true)->get();
+        $data = Data::where('isApproved', true)->get();
         return response()->json([
-            'posts' => $posts,
+            'data' => $data,
         ]);
     }
 
@@ -43,22 +43,23 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'description' => 'required|string'
+            'description' => 'string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
-        $post = Post::create([
+        $data = Data::create([
             'description' => $request->description,
+            'data'=> $request->data,
             'user_id' => Auth::user()->id
         ]);
 
-        //We can also approve users (admin user) posts automatically
+        //We can also approve users (admin user) data automatically
 //        if (Auth::user()->can('system-admin')) {
-//            $post->isApproved=true;
-//            $post->save();
+//            $data->isApproved=true;
+//            $data->save();
 //        }
 
         return response()->json([
@@ -75,17 +76,17 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
-        if($post && $post->isApproved) {
+        $data = Data::find($id);
+        if($data && $data->isApproved) {
             return response()->json([
-                'post' => $post,
-                'status' => 'post approved'
+                'data' => $data,
+                'status' => 'Data approved'
             ]);
         }
-        elseif ($post)
+        elseif ($data)
             return response()->json([
-                'post' => null,
-                'status' => 'post not approved'
+                'Data' => null,
+                'status' => 'Data not approved'
             ]);
         return response()->json(['error'=>'id does not exist'], 404);
     }
@@ -100,24 +101,24 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $post = Post::findOrFail($id);
-            if ($request->user()->cannot('post-owner', $post)) {
-                return response()->json(['error'=>'Post Not Owned by User'], 403);
+            $data = Data::findOrFail($id);
+            if ($request->user()->cannot('data-owner', $data)) {
+                return response()->json(['error'=>'Data Not Owned by User'], 403);
             }
         }catch (\Exception $e){
-            return response()->json(['error'=>'Post Not Found'], 404);
+            return response()->json(['error'=>'Data Not Found'], 404);
         }
-
         $validator = Validator::make($request->all(), [
-            'description' => 'required|string'
+            'description' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
-        $post->description =  $request->description;
-        $post->save();
+        $data->description =  $request->description;
+        $data->data = json_encode($request->data);
+        $data->save();
 
         return response()->json([
             'success' => true
@@ -133,47 +134,47 @@ class PostController extends Controller
     public function destroy($id)
     {
         try {
-            $post = Post::findOrFail($id);
-            if (Auth::user()->cannot('post-owner', $post) && Auth::user()->cannot('system-admin')) {
-                return response()->json(['error'=>'Post Not Owned by User'], 403);
+            $data = Data::findOrFail($id);
+            if (Auth::user()->cannot('data-owner', $data) && Auth::user()->cannot('system-admin')) {
+                return response()->json(['error'=>'Data Not Owned by User'], 403);
             }
         }catch (\Exception $e){
-            return response()->json(['error'=>'Post Not Found'], 404);
+            return response()->json(['error'=>'Data Not Found'], 404);
         }
 
-        $post->delete();
+        $data->delete();
         return response()->json([
             'success' => 'true',
-            'message' => 'Post Deleted Successfully'
+            'message' => 'Data Deleted Successfully'
         ]);
     }
 
-    public function approvePost($id){
+    public function approveData($id){
         try {
-            $post = Post::findOrFail($id);
+            $data = Data::findOrFail($id);
             if (Auth::user()->cannot('system-admin')) {
-                return response()->json(['error'=>'User cannot validate posts, invalid access'], 403);
+                return response()->json(['error'=>'User cannot validate data, invalid access'], 403);
             }
         }catch (\Exception $e){
-            return response()->json(['error'=>'Post Not Found'], 404);
+            return response()->json(['error'=>'Data Not Found'], 404);
         }
 
-        $post->isApproved = true;
-        $post->save();
+        $data->isApproved = true;
+        $data->save();
 
         return response()->json([
             'success' => 'true',
-            'message' => 'Post Approved Successfully'
+            'message' => 'Data Approved Successfully'
         ]);
     }
 
-    public function unapprovedPosts(){
+    public function unapprovedData(){
         if (Auth::user()->cannot('system-admin')) {
             return response()->json(['error'=>'Invalid access'], 403);
         }
-        $posts = Post::where('isApproved', false)->get();
+        $data = Data::where('isApproved', false)->get();
         return response()->json([
-            'posts' => $posts,
+            'data' => $data,
         ]);
     }
 }

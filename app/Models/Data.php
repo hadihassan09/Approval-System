@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Data extends Model
 {
 
     /**
@@ -13,8 +13,9 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'description'
+        'description',
+        'data',
+        'user_id'
     ];
 
     /**
@@ -25,6 +26,10 @@ class Post extends Model
     protected $hidden = [
         'isApproved',
         'user_id'
+    ];
+
+    protected $casts = [
+        'data' => 'array',
     ];
 
     public function user()

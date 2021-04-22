@@ -33,12 +33,12 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 });
 
 $router->group(['middleware' => 'auth', 'prefix'=> 'api/'], function () use ($router) {
-    $router->get('posts', 'PostController@index');
-    $router->get('posts/{id:[\d]+}', 'PostController@show');
-    $router->post('posts', 'PostController@store');
-    $router->put('posts/{id}', 'PostController@update');
-    $router->delete('posts/{id}', 'PostController@destroy');
+    $router->get('data', 'DataController@index');
+    $router->get('data/{id:[\d]+}', 'DataController@show');
+    $router->post('data', 'DataController@store');
+    $router->put('data/{id}', 'DataController@update');
+    $router->delete('data/{id}', 'DataController@destroy');
 
-    $router->get('posts/unapproved', 'PostController@unapprovedPosts');
-    $router->get('posts/{id:[\d]+}/approve', 'PostController@approvePost');
+    $router->get('data/unapproved', 'DataController@unapprovedData');
+    $router->get('data/{id:[\d]+}/approve', 'DataController@approveData');
 });
