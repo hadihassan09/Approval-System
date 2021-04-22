@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Temp extends Model
 {
 
     /**
@@ -13,8 +13,11 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'description'
+        'type',
+        'table',
+        'query',
+        'bindings',
+        'output'
     ];
 
     /**
@@ -23,12 +26,5 @@ class Post extends Model
      * @var array
      */
     protected $hidden = [
-        'isApproved',
-        'user_id'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

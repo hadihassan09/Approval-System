@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\News;
 use App\Models\Post;
 use App\Models\Token;
 use App\Models\User;
@@ -27,8 +28,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Gate::define('post-owner', function (User $user, Post $post) {
-            return $user->id === $post->user_id;
+        Gate::define('owner', function (User $user, News $news) {
+            return $user->id === $news->user_id;
         });
 
         Gate::define('system-admin', function (User $user) {
