@@ -34,10 +34,17 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 
 $router->group(['middleware' => 'auth', 'prefix'=> 'api/'], function () use ($router) {
 
+    // News
     $router->get('news', 'NewsController@index');
     $router->post('news', 'NewsController@store');
     $router->put('news/{id}', 'NewsController@update');
     $router->delete('news/{id}', 'NewsController@destroy');
+
+    //Countries
+    $router->get('countries', 'CountryController@index');
+    $router->post('countries', 'CountryController@store');
+    $router->put('countries/{id}', 'CountryController@update');
+    $router->delete('countries/{id}', 'CountryController@destroy');
 
     $router->get('requests', 'AdminController@unapprovedRequests');
     $router->get('requests/{id:[\d]+}/approve', 'AdminController@approveRequest');
