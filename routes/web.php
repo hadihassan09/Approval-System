@@ -52,6 +52,12 @@ $router->group(['middleware' => 'auth', 'prefix'=> 'api/'], function () use ($ro
     $router->put('languages/{id}', 'LanguageController@update');
     $router->delete('languages/{id}', 'LanguageController@destroy');
 
+    // Regions
+    $router->get('regions', 'RegionController@index');
+    $router->post('regions', 'RegionController@store');
+    $router->put('regions/{id}', 'RegionController@update');
+    $router->delete('regions/{id}', 'RegionController@destroy');
+
     $router->get('requests', 'AdminController@unapprovedRequests');
     $router->get('requests/{id:[\d]+}/approve', 'AdminController@approveRequest');
 });
