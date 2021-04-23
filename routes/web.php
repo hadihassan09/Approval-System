@@ -40,11 +40,17 @@ $router->group(['middleware' => 'auth', 'prefix'=> 'api/'], function () use ($ro
     $router->put('news/{id}', 'NewsController@update');
     $router->delete('news/{id}', 'NewsController@destroy');
 
-    //Countries
+    // Countries
     $router->get('countries', 'CountryController@index');
     $router->post('countries', 'CountryController@store');
     $router->put('countries/{id}', 'CountryController@update');
     $router->delete('countries/{id}', 'CountryController@destroy');
+
+    // Languages
+    $router->get('languages', 'LanguageController@index');
+    $router->post('languages', 'LanguageController@store');
+    $router->put('languages/{id}', 'LanguageController@update');
+    $router->delete('languages/{id}', 'LanguageController@destroy');
 
     $router->get('requests', 'AdminController@unapprovedRequests');
     $router->get('requests/{id:[\d]+}/approve', 'AdminController@approveRequest');
