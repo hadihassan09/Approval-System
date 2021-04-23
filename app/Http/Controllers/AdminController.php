@@ -9,14 +9,30 @@ use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
 
-    public function executeQuery($query, $type, $param){
-        if($type == 'create'){
-            DB::insert($query, json_decode($param));
-        }elseif ($type == 'update'){
-            DB::update($query, json_decode($param));
-        }elseif ($type == 'delete'){
-            DB::delete($query, json_decode($param));
+    public function array_replace_value($search, $replace, array $subject) {
+        $updatedArray = [];
+        foreach ($subject as $key => $value) {
+            if ($value == $search) {
+                $updatedArray = array_merge($updatedArray, [$key => $replace]);
+                continue;
+            }
+            $updatedArray = array_merge($updatedArray, [$key => $value]);
         }
+        return $updatedArray;
+    }
+
+    public function executeQuery($queries, $type, $params, $tables=null){
+        $key = null;
+        for($i=0; $i < count($params); $i++)
+            if($type == 'create'){
+                if($i != 0) $params[$i] = $this->array_replace_value('#',$key, $params[$i]);
+                if($i == 0) $key = DB::table($tables[$i])->insertGetId($params[$i]);
+                else DB::table($tables[$i])->insertGetId($params[$i]);
+            }elseif ($type == 'update'){
+                DB::update($queries[$i], $params[$i]);
+            }elseif ($type == 'delete'){
+                DB::delete($queries[$i], $params[$i]);
+            }
     }
 
     public function approveRequest($id){
@@ -29,7 +45,7 @@ class AdminController extends Controller
             return response()->json(['error'=>'Request Not Found'], 404);
         }
 
-        $this->executeQuery($request->query, $request->type, $request->bindings);
+        $this->executeQuery(json_decode($request->queries), $request->type, json_decode($request->bindings, true), json_decode($request->table));
         $request->forceDelete();
 
         return response()->json([
@@ -84,7 +100,7 @@ class AdminController extends Controller
             return response()->json(['error'=>'Request Not Found'], 404);
         }
 
-        $this->executeQuery($request->query, $request->type, $request->bindings);
+        $this->executeQuery(json_decode($request->queries), $request->type, json_decode($request->bindings));
         $request->forceDelete();
 
         return response()->json([
