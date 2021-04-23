@@ -15,7 +15,7 @@ class CreateTempsTable extends Migration
     {
         Schema::create('temps', function (Blueprint $table) {
             $table->id();
-            $table->string('query');
+            $table->json('queries')->nullable();
             $table->json('bindings');
             $table->json('output');
             $table->string('type');

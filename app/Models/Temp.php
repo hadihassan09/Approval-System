@@ -17,7 +17,7 @@ class Temp extends Model
     protected $fillable = [
         'type',
         'table',
-        'query',
+        'queries',
         'bindings',
         'output'
     ];
