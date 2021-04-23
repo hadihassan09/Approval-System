@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Temp;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -63,31 +64,40 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'address' => 'required|string',
+            'role' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $params = [
+            0=>['name' => $request->name, 'email' => $request->email, 'password' => Hash::make($request->password)],
+            1=>['address' => $request->address, 'user_id' => '#'],
+            2=>['role' => $request->role, 'user_id' => '#'],
+        ];
 
-        $token = Token::create([
-            'token'=>Str::random(60),
-            'user_id'=> $user->id
+        $user = new \stdClass();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->info = ['address' => $request->address];
+        $user->role = ['role' => $request->role];
+
+        $temp = Temp::create([
+            'type'=>'create',
+            'table' => json_encode(['users', 'users_information', 'users_roles']),
+            'bindings' => json_encode($params),
+            'output' => json_encode($user)
         ]);
 
         return response()->json([
-            'access_token' => $token,
-            'email' => $user->email
+            'status' => 'pending'
         ]);
     }
 

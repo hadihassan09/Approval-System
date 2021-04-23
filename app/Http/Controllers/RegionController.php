@@ -49,16 +49,15 @@ class RegionController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
-        $Query = 'INSERT INTO REGIONS (region) VALUES (?)';
-        $params = [$request->region];
+
+        $params = [0=>['region' => $request->region]];
 
         $region = new Region();
         $region->region = $request->region;
 
         $temp = Temp::create([
             'type'=>'create',
-            'table' => 'regions',
-            'query' => $Query,
+            'table' => json_encode(['regions']),
             'bindings' => json_encode($params),
             'output' => json_encode($region)
         ]);
@@ -103,12 +102,12 @@ class RegionController extends Controller
         $output->old = $region;
         $output->new = $newRegion;
 
-        $Query = 'UPDATE REGIONS SET region = ?  WHERE id = ?';
-        $params = [$request->region, $region->id];
+        $Query = [0=>'UPDATE REGIONS SET region = ?  WHERE id = ?'];
+        $params = [[$request->region, $region->id]];
         $temp = Temp::create([
             'type'=>'update',
             'table' => 'regions',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($output)
         ]);
@@ -132,12 +131,12 @@ class RegionController extends Controller
             return response()->json(['error'=>'Region Not Found'], 404);
         }
 
-        $Query = 'DELETE FROM REGIONS WHERE id=?';
-        $params = [$id];
+        $Query = [0=>'DELETE FROM REGIONS WHERE id=?'];
+        $params = [[$id]];
         $temp = Temp::create([
             'type'=>'delete',
             'table' => 'regions',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($region)
         ]);

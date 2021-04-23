@@ -49,16 +49,14 @@ class LanguageController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
-        $Query = 'INSERT INTO LANGUAGES (language ) VALUES (?)';
-        $params = [$request->language];
+        $params = [0=>['language'=>$request->language]];
 
         $language = new Language();
         $language->language = $request->language;
 
         $temp = Temp::create([
             'type'=>'create',
-            'table' => 'languages',
-            'query' => $Query,
+            'table' => json_encode(['languages']),
             'bindings' => json_encode($params),
             'output' => json_encode($language)
         ]);
@@ -103,12 +101,12 @@ class LanguageController extends Controller
         $output->old = $language;
         $output->new = $newLanguage;
 
-        $Query = 'UPDATE LANGUAGES SET language = ?  WHERE id = ?';
-        $params = [$request->language, $language->id];
+        $Query = [0=>'UPDATE LANGUAGES SET language = ?  WHERE id = ?'];
+        $params = [[$request->language, $language->id]];
         $temp = Temp::create([
             'type'=>'update',
             'table' => 'languages',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($output)
         ]);
@@ -132,12 +130,12 @@ class LanguageController extends Controller
             return response()->json(['error'=>'Language Not Found'], 404);
         }
 
-        $Query = 'DELETE FROM LANGUAGES WHERE id=?';
-        $params = [$id];
+        $Query = [0=>'DELETE FROM LANGUAGES WHERE id=?'];
+        $params = [[$id]];
         $temp = Temp::create([
             'type'=>'delete',
             'table' => 'languages',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($language)
         ]);

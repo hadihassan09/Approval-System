@@ -48,16 +48,15 @@ class CountryController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
-        $Query = 'INSERT INTO Countries (country) VALUES (?)';
-        $params = [$request->country];
+
+        $params = [0=>['country' => $request->country]];
 
         $country = new Country();
         $country->country = $request->country;
 
         $temp = Temp::create([
             'type'=>'create',
-            'table' => 'countries',
-            'query' => $Query,
+            'table' => json_encode(['countries']),
             'bindings' => json_encode($params),
             'output' => json_encode($country)
         ]);
@@ -102,12 +101,12 @@ class CountryController extends Controller
         $output->old = $country;
         $output->new = $newCountry;
 
-        $Query = 'UPDATE Countries SET country = ?  WHERE id = ?';
-        $params = [$request->country, $country->id];
+        $Query = [0=>'UPDATE Countries SET country = ?  WHERE id = ?'];
+        $params = [[$request->country, $country->id]];
         $temp = Temp::create([
             'type'=>'update',
             'table' => 'countries',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($output)
         ]);
@@ -131,12 +130,12 @@ class CountryController extends Controller
             return response()->json(['error'=>'Country Not Found'], 404);
         }
 
-        $Query = 'DELETE FROM Countries WHERE id=?';
-        $params = [$id];
+        $Query = [0=>'DELETE FROM Countries WHERE id=?'];
+        $params = [[$id]];
         $temp = Temp::create([
             'type'=>'delete',
             'table' => 'countries',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($country)
         ]);

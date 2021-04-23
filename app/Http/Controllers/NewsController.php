@@ -49,8 +49,7 @@ class NewsController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()], 422);
         }
-        $Query = 'INSERT INTO NEWS (description, user_id) VALUES (?, ?)';
-        $params = [$request->description, $request->user()->id];
+        $params = [0=>['description'=>$request->description, 'user_id'=>$request->user()->id]];
 
         $news = new News();
         $news->description = $request->description;
@@ -58,8 +57,7 @@ class NewsController extends Controller
 
         $temp = Temp::create([
             'type'=>'create',
-            'table' => 'news',
-            'query' => $Query,
+            'table' => json_encode(['news']),
             'bindings' => json_encode($params),
             'output' => json_encode($news)
         ]);
@@ -108,12 +106,12 @@ class NewsController extends Controller
         $output->old = $news;
         $output->new = $newNews;
 
-        $Query = 'UPDATE NEWS SET description = ?, user_id = ?  WHERE id = ?';
-        $params = [$request->description, $request->user()->id, $news->id];
+        $Query = [0=>'UPDATE NEWS SET description = ?, user_id = ?  WHERE id = ?'];
+        $params = [[$request->description, $request->user()->id, $news->id]];
         $temp = Temp::create([
             'type'=>'update',
             'table' => 'news',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($output)
         ]);
@@ -140,12 +138,12 @@ class NewsController extends Controller
             return response()->json(['error'=>'News Not Found'], 404);
         }
 
-        $Query = 'DELETE FROM NEWS WHERE id=?';
-        $params = [$id];
+        $Query = [0=>'DELETE FROM NEWS WHERE id=?'];
+        $params = [[$id]];
         $temp = Temp::create([
             'type'=>'delete',
             'table' => 'news',
-            'query' => $Query,
+            'queries' => json_encode($Query),
             'bindings' => json_encode($params),
             'output' => json_encode($news)
         ]);
