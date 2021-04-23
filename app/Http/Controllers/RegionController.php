@@ -96,6 +96,13 @@ class RegionController extends Controller
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
+        $newRegion = new Region();
+        $newRegion->region = $request->region;
+
+        $output = new \stdClass();
+        $output->old = $region;
+        $output->new = $newRegion;
+
         $Query = 'UPDATE REGIONS SET region = ?  WHERE id = ?';
         $params = [$request->region, $region->id];
         $temp = Temp::create([
@@ -103,7 +110,7 @@ class RegionController extends Controller
             'table' => 'regions',
             'query' => $Query,
             'bindings' => json_encode($params),
-            'output' => json_encode($region)
+            'output' => json_encode($output)
         ]);
 
         return response()->json([

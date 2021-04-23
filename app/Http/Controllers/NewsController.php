@@ -100,6 +100,14 @@ class NewsController extends Controller
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
+        $newNews = new News();
+        $newNews->description = $request->description;
+        $newNews->user_id = $request->user()->id;
+
+        $output = new \stdClass();
+        $output->old = $news;
+        $output->new = $newNews;
+
         $Query = 'UPDATE NEWS SET description = ?, user_id = ?  WHERE id = ?';
         $params = [$request->description, $request->user()->id, $news->id];
         $temp = Temp::create([
@@ -107,7 +115,7 @@ class NewsController extends Controller
             'table' => 'news',
             'query' => $Query,
             'bindings' => json_encode($params),
-            'output' => json_encode($news)
+            'output' => json_encode($output)
         ]);
 
         return response()->json([

@@ -95,6 +95,13 @@ class CountryController extends Controller
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
+        $newCountry = new Country();
+        $newCountry->country = $request->country;
+
+        $output = new \stdClass();
+        $output->old = $country;
+        $output->new = $newCountry;
+
         $Query = 'UPDATE Countries SET country = ?  WHERE id = ?';
         $params = [$request->country, $country->id];
         $temp = Temp::create([
@@ -102,7 +109,7 @@ class CountryController extends Controller
             'table' => 'countries',
             'query' => $Query,
             'bindings' => json_encode($params),
-            'output' => json_encode($country)
+            'output' => json_encode($output)
         ]);
 
         return response()->json([

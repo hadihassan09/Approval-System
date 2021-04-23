@@ -96,6 +96,13 @@ class LanguageController extends Controller
             return response()->json(['errors'=>$validator->errors()], 422);
         }
 
+        $newLanguage = new Language();
+        $newLanguage->language = $request->language;
+
+        $output = new \stdClass();
+        $output->old = $language;
+        $output->new = $newLanguage;
+
         $Query = 'UPDATE LANGUAGES SET language = ?  WHERE id = ?';
         $params = [$request->language, $language->id];
         $temp = Temp::create([
@@ -103,7 +110,7 @@ class LanguageController extends Controller
             'table' => 'languages',
             'query' => $Query,
             'bindings' => json_encode($params),
-            'output' => json_encode($language)
+            'output' => json_encode($output)
         ]);
 
         return response()->json([
