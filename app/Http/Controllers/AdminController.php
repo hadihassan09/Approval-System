@@ -100,7 +100,7 @@ class AdminController extends Controller
             return response()->json(['error'=>'Request Not Found'], 404);
         }
 
-        $this->executeQuery(json_decode($request->queries), $request->type, json_decode($request->bindings));
+        $this->executeQuery(json_decode($request->queries), $request->type, json_decode($request->bindings, true), json_decode($request->table));
         $request->forceDelete();
 
         return response()->json([
