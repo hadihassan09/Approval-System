@@ -30,11 +30,38 @@ class AdminController extends Controller
         }
 
         $this->executeQuery($request->query, $request->type, $request->bindings);
-        $request->delete();
+        $request->forceDelete();
 
         return response()->json([
             'success' => 'true',
             'message' => 'Request Approved Successfully'
+        ]);
+    }
+
+    public function unapproveRequest($id){
+        try {
+            $request = Temp::findOrFail($id);
+            if (Auth::user()->cannot('system-admin')) {
+                return response()->json(['error'=>'User cannot validate requests, invalid access'], 403);
+            }
+        }catch (\Exception $e){
+            return response()->json(['error'=>'Request Not Found'], 404);
+        }
+
+        $request->delete();
+
+        return response()->json([
+            'success' => 'true',
+            'message' => 'Request UnApproved Successfully'
+        ]);
+    }
+
+    public function Requests(){
+        if (Auth::user()->cannot('system-admin')) {
+            return response()->json(['error'=>'Invalid access'], 403);
+        }
+        return response()->json([
+            'requests' => Temp::all(),
         ]);
     }
 
@@ -43,7 +70,26 @@ class AdminController extends Controller
             return response()->json(['error'=>'Invalid access'], 403);
         }
         return response()->json([
-            'requests' => Temp::all(),
+            'unapproved requests' => Temp::onlyTrashed()->get(),
+        ]);
+    }
+
+    public function reapproveRequest($id){
+        try {
+            $request = Temp::onlyTrashed()->findOrFail($id);
+            if (Auth::user()->cannot('system-admin')) {
+                return response()->json(['error'=>'User cannot validate requests, invalid access'], 403);
+            }
+        }catch (\Exception $e){
+            return response()->json(['error'=>'Request Not Found'], 404);
+        }
+
+        $this->executeQuery($request->query, $request->type, $request->bindings);
+        $request->forceDelete();
+
+        return response()->json([
+            'success' => 'true',
+            'message' => 'Request Approved Successfully'
         ]);
     }
 }

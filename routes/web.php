@@ -58,6 +58,10 @@ $router->group(['middleware' => 'auth', 'prefix'=> 'api/'], function () use ($ro
     $router->put('regions/{id}', 'RegionController@update');
     $router->delete('regions/{id}', 'RegionController@destroy');
 
-    $router->get('requests', 'AdminController@unapprovedRequests');
+    $router->get('requests', 'AdminController@Requests');
     $router->get('requests/{id:[\d]+}/approve', 'AdminController@approveRequest');
+    $router->get('requests/{id:[\d]+}/unapprove', 'AdminController@unapproveRequest');
+    $router->get('requests/unapproved', 'AdminController@unapprovedRequests');
+    $router->get('requests/{id:[\d]+}/reapprove', 'AdminController@reapproveRequest');
+
 });

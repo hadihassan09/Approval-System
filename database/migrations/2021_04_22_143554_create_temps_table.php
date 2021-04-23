@@ -20,6 +20,7 @@ class CreateTempsTable extends Migration
             $table->json('output');
             $table->string('type');
             $table->string('table');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
